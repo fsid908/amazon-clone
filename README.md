@@ -1,2 +1,2 @@
 # amazon-clone
-### Project is under process
+# Project is under development
