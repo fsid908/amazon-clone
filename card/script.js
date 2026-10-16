@@ -37,3 +37,40 @@ searchInput.addEventListener("input", function (e) {
         noResults.style.display = "none";
     }
 });
+// Back to Top Button
+let topBtn = document.createElement("button");
+
+topBtn.innerHTML = '<i class="fa-solid fa-arrow-up"></i>';
+topBtn.id = "back-to-top";
+topBtn.title = "Back to Top";
+
+document.body.appendChild(topBtn);
+
+window.addEventListener("scroll", () => {
+  topBtn.style.display = window.scrollY > 300 ? "block" : "none";
+});
+
+topBtn.addEventListener("click", () => {
+  window.scrollTo({ top: 0, behavior: "smooth" });
+});
+// Clear Search Button
+let searchBox = document.querySelector("#search-box");
+let clearBtn = document.createElement("button");
+
+clearBtn.textContent = "✕";
+clearBtn.title = "Clear Search";
+clearBtn.style.cssText =
+  "display:none; cursor:pointer; padding:8px; border:0;";
+
+searchBox.insertAdjacentElement("afterend", clearBtn);
+
+searchBox.addEventListener("input", () => {
+  clearBtn.style.display = searchBox.value ? "block" : "none";
+});
+
+clearBtn.addEventListener("click", () => {
+  searchBox.value = "";
+  searchBox.dispatchEvent(new Event("input"));
+  clearBtn.style.display = "none";
+  searchBox.focus();
+});
