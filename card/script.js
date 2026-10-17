@@ -1,76 +1,280 @@
 
-let searchInput = document.querySelector("#search-box");
-let cards = document.querySelectorAll(".card-box, .mini");
-let container = document.querySelector("#container");
+/* =========================================
+   AMAZON CLONE - TOAST NOTIFICATIONS
+========================================= */
 
-// No-results message create karna
-let noResults = document.createElement("p");
-noResults.textContent = "No matching categories found.";
-noResults.style.display = "none";
-noResults.style.textAlign = "center";
-noResults.style.padding = "20px";
-noResults.style.fontSize = "18px";
+const toast = document.createElement("div");
+toast.id = "amazon-toast";
+toast.setAttribute("role", "status");
+toast.setAttribute("aria-live", "polite");
 
-container.insertAdjacentElement("afterend", noResults);
+toast.innerHTML = `
+  <span class="toast-icon" aria-hidden="true">✓</span>
+  <span class="toast-text"></span>
+`;
 
-searchInput.addEventListener("input", function (e) {
-    let searchText = e.target.value.toLowerCase().trim();
-    let visibleCards = 0;
+document.body.appendChild(toast);
 
-    cards.forEach((card) => {
-        let heading = card.querySelector("h3");
-        let headingText = heading.textContent.toLowerCase();
+let toastTimer;
 
-        let isMatch = headingText.includes(searchText);
+function showToast(message, duration = 2500) {
+  const toastText = toast.querySelector(".toast-text");
 
-        if (isMatch) {
-            card.style.display = "";
-            visibleCards++;
-        } else {
-            card.style.display = "none";
-        }
+  // Previous timer ko clear karo
+  clearTimeout(toastTimer);
+
+  // Message update karo
+  toastText.textContent = message;
+
+  // Notification show karo
+  toast.classList.add("toast-visible");
+
+  // Automatically hide after duration
+  toastTimer = setTimeout(() => {
+    toast.classList.remove("toast-visible");
+  }, duration);
+}
+
+
+/* =========================================
+   AMAZON CLONE - SEARCH FUNCTIONALITY
+========================================= */
+
+const searchInput = document.querySelector("#search-box");
+const clearBtn = document.querySelector("#clear-search");
+
+const homeSections = document.querySelectorAll(
+  ".background-img, #container, #box, " +
+  ".trending-section, .deals-section, .best-sellers, " +
+  "#bottom-content, .back-to-top-box, .last-bottom-txt, footer"
+);
+
+// Search results area create karo
+const resultsSection = document.createElement("section");
+resultsSection.id = "search-results";
+
+resultsSection.innerHTML = `
+  <div class="search-results-heading">
+    <h2>Search results</h2>
+    <p id="results-count"></p>
+  </div>
+
+  <div id="results-grid"></div>
+
+  <div id="no-results">
+    <div class="empty-search-icon">⌕</div>
+    <h2>No results found</h2>
+    <p>Try checking your spelling or use different keywords.</p>
+  </div>
+`;
+
+const navigation = document.querySelector(".Navigation");
+
+if (navigation) {
+  navigation.insertAdjacentElement("afterend", resultsSection);
+}
+
+const resultsGrid = resultsSection.querySelector("#results-grid");
+const resultsCount = resultsSection.querySelector("#results-count");
+const noResults = resultsSection.querySelector("#no-results");
+
+resultsSection.style.display = "none";
+
+
+/* =========================================
+   COLLECT SEARCHABLE ITEMS
+========================================= */
+
+function getSearchItems() {
+  const items = [];
+
+  // Category cards
+  document
+    .querySelectorAll("#container .card-box, #container .mini")
+    .forEach((card) => {
+      const heading = card.querySelector("h3");
+      const img = card.querySelector("img");
+
+      if (!heading) return;
+
+      items.push({
+        title: heading.textContent.trim(),
+        image: img?.getAttribute("src"),
+        alt: img?.getAttribute("alt") || "",
+        description: "Category",
+        keywords: card.textContent
+      });
     });
 
-    if (visibleCards === 0) {
-        noResults.style.display = "block";
-    } else {
-        noResults.style.display = "none";
-    }
-});
-// Back to Top Button
-let topBtn = document.createElement("button");
+  // Trending, deals and best-seller cards
+  document
+    .querySelectorAll(
+      ".trending-card, .deal-card, .best-seller-card"
+    )
+    .forEach((card) => {
+      const heading =
+        card.querySelector(".deal-name") ||
+        card.querySelector("h3");
+
+      const img = card.querySelector("img");
+
+      if (!heading) return;
+
+      const price =
+        card.querySelector(".deal-price, .bs-price");
+
+      items.push({
+        title: heading.textContent.trim(),
+        image: img?.getAttribute("src"),
+        alt: img?.getAttribute("alt") || "",
+        description: price?.textContent.trim() || "",
+        keywords: card.textContent
+      });
+    });
+
+  return items;
+}
+
+const searchItems = getSearchItems();
+
+
+/* =========================================
+   CREATE SEARCH RESULT CARD
+========================================= */
+
+function createResultCard(item) {
+  const card = document.createElement("article");
+  card.className = "search-result-card";
+
+  if (item.image) {
+    const img = document.createElement("img");
+    img.src = item.image;
+    img.alt = item.alt || item.title;
+    img.loading = "lazy";
+
+    card.appendChild(img);
+  }
+
+  const title = document.createElement("h3");
+  title.textContent = item.title;
+  card.appendChild(title);
+
+  if (item.description) {
+    const description = document.createElement("p");
+    description.textContent = item.description;
+    card.appendChild(description);
+  }
+
+  return card;
+}
+
+
+/* =========================================
+   PERFORM SEARCH
+========================================= */
+
+function performSearch() {
+  const query = searchInput.value.trim().toLowerCase();
+
+  if (clearBtn) {
+    clearBtn.style.display = query ? "block" : "none";
+  }
+
+  // Empty search: homepage restore
+  if (!query) {
+    resultsSection.style.display = "none";
+
+    homeSections.forEach((section) => {
+      section.style.display = "";
+    });
+
+    return;
+  }
+
+  // Search mode: homepage sections hide
+  homeSections.forEach((section) => {
+    section.style.display = "none";
+  });
+
+  resultsSection.style.display = "block";
+  resultsGrid.replaceChildren();
+
+  const matches = searchItems.filter((item) => {
+    const searchableText = [
+      item.title,
+      item.alt,
+      item.description,
+      item.keywords
+    ]
+      .join(" ")
+      .toLowerCase();
+
+    return searchableText.includes(query);
+  });
+
+  resultsCount.textContent =
+    `${matches.length} result${matches.length === 1 ? "" : "s"} for "${searchInput.value.trim()}"`;
+
+  if (matches.length === 0) {
+    noResults.style.display = "block";
+    resultsGrid.style.display = "none";
+    return;
+  }
+
+  noResults.style.display = "none";
+  resultsGrid.style.display = "grid";
+
+  matches.forEach((item) => {
+    resultsGrid.appendChild(createResultCard(item));
+  });
+}
+
+if (searchInput) {
+  searchInput.addEventListener("input", performSearch);
+}
+
+
+/* =========================================
+   CLEAR SEARCH + TOAST
+========================================= */
+
+if (clearBtn && searchInput) {
+  clearBtn.addEventListener("click", () => {
+    // Search clear karo
+    searchInput.value = "";
+
+    // Homepage restore karo
+    performSearch();
+
+    // Toast notification dikhao
+    showToast("Search cleared successfully");
+
+    searchInput.focus();
+  });
+}
+
+
+/* =========================================
+   BACK TO TOP BUTTON
+========================================= */
+
+const topBtn = document.createElement("button");
 
 topBtn.innerHTML = '<i class="fa-solid fa-arrow-up"></i>';
 topBtn.id = "back-to-top";
 topBtn.title = "Back to Top";
+topBtn.setAttribute("aria-label", "Back to Top");
 
 document.body.appendChild(topBtn);
 
 window.addEventListener("scroll", () => {
-  topBtn.style.display = window.scrollY > 300 ? "block" : "none";
+  topBtn.style.display =
+    window.scrollY > 300 ? "block" : "none";
 });
 
 topBtn.addEventListener("click", () => {
-  window.scrollTo({ top: 0, behavior: "smooth" });
-});
-// Clear Search Button
-let searchBox = document.querySelector("#search-box");
-let clearBtn = document.createElement("button");
-
-clearBtn.textContent = "✕";
-clearBtn.title = "Clear Search";
-clearBtn.style.cssText =
-  "display:none; cursor:pointer; padding:8px; border:0;";
-
-searchBox.insertAdjacentElement("afterend", clearBtn);
-
-searchBox.addEventListener("input", () => {
-  clearBtn.style.display = searchBox.value ? "block" : "none";
-});
-
-clearBtn.addEventListener("click", () => {
-  searchBox.value = "";
-  searchBox.dispatchEvent(new Event("input"));
-  clearBtn.style.display = "none";
-  searchBox.focus();
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
+  });
 });
