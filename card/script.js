@@ -1,4 +1,3 @@
-
 /* =========================================
    AMAZON CLONE - TOAST NOTIFICATIONS
 ========================================= */
@@ -35,7 +34,6 @@ function showToast(message, duration = 2500) {
   }, duration);
 }
 
-
 /* =========================================
    AMAZON CLONE - SEARCH FUNCTIONALITY
 ========================================= */
@@ -45,8 +43,8 @@ const clearBtn = document.querySelector("#clear-search");
 
 const homeSections = document.querySelectorAll(
   ".background-img, #container, #box, " +
-  ".trending-section, .deals-section, .best-sellers, " +
-  "#bottom-content, .back-to-top-box, .last-bottom-txt, footer"
+    ".trending-section, .deals-section, .best-sellers, " +
+    "#bottom-content, .back-to-top-box, .last-bottom-txt, footer",
 );
 
 // Search results area create karo
@@ -80,7 +78,6 @@ const noResults = resultsSection.querySelector("#no-results");
 
 resultsSection.style.display = "none";
 
-
 /* =========================================
    COLLECT SEARCHABLE ITEMS
 ========================================= */
@@ -102,33 +99,29 @@ function getSearchItems() {
         image: img?.getAttribute("src"),
         alt: img?.getAttribute("alt") || "",
         description: "Category",
-        keywords: card.textContent
+        keywords: card.textContent,
       });
     });
 
   // Trending, deals and best-seller cards
   document
-    .querySelectorAll(
-      ".trending-card, .deal-card, .best-seller-card"
-    )
+    .querySelectorAll(".trending-card, .deal-card, .best-seller-card")
     .forEach((card) => {
       const heading =
-        card.querySelector(".deal-name") ||
-        card.querySelector("h3");
+        card.querySelector(".deal-name") || card.querySelector("h3");
 
       const img = card.querySelector("img");
 
       if (!heading) return;
 
-      const price =
-        card.querySelector(".deal-price, .bs-price");
+      const price = card.querySelector(".deal-price, .bs-price");
 
       items.push({
         title: heading.textContent.trim(),
         image: img?.getAttribute("src"),
         alt: img?.getAttribute("alt") || "",
-        description: price?.textContent.trim() || "",
-        keywords: card.textContent
+        description: price ? price.childNodes[0].textContent.trim() : "",
+        keywords: card.textContent,
       });
     });
 
@@ -136,7 +129,6 @@ function getSearchItems() {
 }
 
 const searchItems = getSearchItems();
-
 
 /* =========================================
    CREATE SEARCH RESULT CARD
@@ -167,7 +159,6 @@ function createResultCard(item) {
 
   return card;
 }
-
 
 /* =========================================
    PERFORM SEARCH
@@ -204,7 +195,7 @@ function performSearch() {
       item.title,
       item.alt,
       item.description,
-      item.keywords
+      item.keywords,
     ]
       .join(" ")
       .toLowerCase();
@@ -212,8 +203,7 @@ function performSearch() {
     return searchableText.includes(query);
   });
 
-  resultsCount.textContent =
-    `${matches.length} result${matches.length === 1 ? "" : "s"} for "${searchInput.value.trim()}"`;
+  resultsCount.textContent = `${matches.length} result${matches.length === 1 ? "" : "s"} for "${searchInput.value.trim()}"`;
 
   if (matches.length === 0) {
     noResults.style.display = "block";
@@ -232,7 +222,6 @@ function performSearch() {
 if (searchInput) {
   searchInput.addEventListener("input", performSearch);
 }
-
 
 /* =========================================
    CLEAR SEARCH + TOAST
@@ -253,6 +242,339 @@ if (clearBtn && searchInput) {
   });
 }
 
+/* =====================================
+   SHOPPING CART - STAGE 1
+   Drawer, overlay and cart count
+===================================== */
+
+// Existing header cart link
+const cartLink = document.querySelector(
+  "#amazon-logo > ul > li:last-child > a",
+);
+
+if (cartLink) {
+  cartLink.classList.add("cart-icon-link");
+  cartLink.setAttribute("href", "#cart-drawer");
+  cartLink.setAttribute("aria-label", "Open shopping cart");
+}
+
+// Create overlay
+const cartOverlay = document.createElement("div");
+cartOverlay.id = "cart-overlay";
+cartOverlay.setAttribute("aria-hidden", "true");
+
+// Create drawer
+const cartDrawer = document.createElement("aside");
+cartDrawer.id = "cart-drawer";
+cartDrawer.setAttribute("aria-label", "Shopping cart");
+cartDrawer.setAttribute("aria-hidden", "true");
+
+cartDrawer.innerHTML = `
+  <div class="cart-drawer-header">
+    <h2>Your Cart (<span id="cart-header-count">0</span>)</h2>
+    <button id="cart-close" type="button" aria-label="Close cart">
+      &times;
+    </button>
+  </div>
+
+  <div id="cart-items">
+    <div class="cart-empty">
+      <i class="fa-solid fa-cart-shopping" aria-hidden="true"></i>
+      <h3>Your Amazon Clone Cart is empty</h3>
+      <p>Add a product to see it here.</p>
+    </div>
+  </div>
+
+  <div class="cart-drawer-footer">
+    <div class="cart-subtotal">
+      <span>Subtotal</span>
+      <span id="cart-subtotal">₹0.00</span>
+    </div>
+    <button class="cart-checkout-btn" type="button" disabled>
+      Proceed to Buy
+    </button>
+  </div>
+`;
+
+document.body.append(cartOverlay, cartDrawer);
+
+// Cart count badge
+let cartBadge = null;
+
+if (cartLink) {
+  cartBadge = document.createElement("span");
+  cartBadge.className = "cart-count-badge";
+  cartBadge.textContent = "0";
+  cartBadge.hidden = true;
+  cartLink.appendChild(cartBadge);
+}
+
+function openCartDrawer() {
+  cartOverlay.classList.add("cart-open");
+  cartDrawer.classList.add("cart-open");
+
+  cartOverlay.setAttribute("aria-hidden", "false");
+  cartDrawer.setAttribute("aria-hidden", "false");
+  document.body.style.overflow = "hidden";
+
+  document.querySelector("#cart-close").focus();
+}
+
+function closeCartDrawer() {
+  cartOverlay.classList.remove("cart-open");
+  cartDrawer.classList.remove("cart-open");
+
+  cartOverlay.setAttribute("aria-hidden", "true");
+  cartDrawer.setAttribute("aria-hidden", "true");
+  document.body.style.overflow = "";
+
+  if (cartLink) {
+    cartLink.focus();
+  }
+}
+
+if (cartLink) {
+  cartLink.addEventListener("click", (event) => {
+    event.preventDefault();
+    openCartDrawer();
+  });
+}
+
+cartOverlay.addEventListener("click", closeCartDrawer);
+
+document
+  .querySelector("#cart-close")
+  .addEventListener("click", closeCartDrawer);
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && cartDrawer.classList.contains("cart-open")) {
+    closeCartDrawer();
+  }
+});
+
+/* =====================================
+   SHOPPING CART - STAGE 2
+   Add products and update cart count
+===================================== */
+
+const cartItems = [];
+
+// Price text ko number mein convert karo
+function getProductPrice(priceText) {
+  const match = priceText.match(/[\d,]+(?:\.\d{1,2})?/);
+
+  if (!match) return 0;
+
+  return Number(match[0].replace(/,/g, ""));
+}
+
+// Product ko cart mein add karo
+function addToCart(product) {
+  const existingItem = cartItems.find((item) => item.id === product.id);
+
+  if (existingItem) {
+    existingItem.quantity += 1;
+  } else {
+    cartItems.push({
+      ...product,
+      quantity: 1,
+    });
+  }
+
+  updateCartUI();
+
+  showToast(`${product.title} added to cart`);
+}
+
+// Cart count aur subtotal update karo
+function updateCartUI() {
+  const totalQuantity = cartItems.reduce(
+    (total, item) => total + item.quantity,
+    0,
+  );
+
+  const subtotal = cartItems.reduce(
+    (total, item) => total + item.price * item.quantity,
+    0,
+  );
+
+  // Header cart count
+  const headerCartCount = document.querySelector(".cart-count");
+
+  if (headerCartCount) {
+    headerCartCount.textContent = totalQuantity;
+  }
+
+  if (cartBadge) {
+    cartBadge.textContent = totalQuantity;
+    cartBadge.hidden = true;
+  }
+
+  // Drawer heading count
+  document.querySelector("#cart-header-count").textContent = totalQuantity;
+
+  // Subtotal
+  document.querySelector("#cart-subtotal").textContent =
+    subtotal.toLocaleString("en-IN", {
+      style: "currency",
+      currency: "INR",
+    });
+
+  // Empty cart state
+  const cartItemsContainer = document.querySelector("#cart-items");
+
+  if (cartItems.length === 0) {
+    cartItemsContainer.innerHTML = `
+      <div class="cart-empty">
+        <i class="fa-solid fa-cart-shopping" aria-hidden="true"></i>
+        <h3>Your Amazon Clone Cart is empty</h3>
+        <p>Add a product to see it here.</p>
+      </div>
+    `;
+  } else {
+    cartItemsContainer.innerHTML = cartItems
+      .map(
+        (item) => `
+  <article class="cart-stage2-item">
+    <img src="${item.image}" alt="${item.title}">
+
+    <div class="cart-item-details">
+      <h3>${item.title}</h3>
+
+      <p class="cart-item-price">
+        ₹${item.price.toLocaleString("en-IN")}
+      </p>
+
+      <div class="cart-quantity-controls">
+        <button
+          type="button"
+          class="quantity-btn"
+          data-action="decrease"
+          data-id="${item.id}"
+          aria-label="Decrease quantity"
+        >−</button>
+
+        <span>${item.quantity}</span>
+
+        <button
+          type="button"
+          class="quantity-btn"
+          data-action="increase"
+          data-id="${item.id}"
+          aria-label="Increase quantity"
+        >+</button>
+      </div>
+
+      <button
+        type="button"
+        class="remove-cart-item"
+        data-id="${item.id}"
+      >Remove</button>
+    </div>
+  </article>
+`,
+      )
+      .join("");
+  }
+
+  // Checkout button only enabled when cart has items
+  document.querySelector(".cart-checkout-btn").disabled =
+    cartItems.length === 0;
+}
+
+
+const cartItemsContainer = document.querySelector("#cart-items");
+
+cartItemsContainer.addEventListener("click", (event) => {
+  const quantityButton = event.target.closest(".quantity-btn");
+  const removeButton = event.target.closest(".remove-cart-item");
+
+  if (quantityButton) {
+    const productId = quantityButton.dataset.id;
+    const action = quantityButton.dataset.action;
+
+    const item = cartItems.find(
+      (product) => String(product.id) === productId
+    );
+
+    if (!item) return;
+
+    if (action === "increase") {
+      item.quantity += 1;
+    } else if (action === "decrease") {
+      item.quantity -= 1;
+
+      if (item.quantity <= 0) {
+        const index = cartItems.indexOf(item);
+        cartItems.splice(index, 1);
+      }
+    }
+
+    updateCartUI();
+  }
+
+  if (removeButton) {
+    const productId = removeButton.dataset.id;
+
+    const index = cartItems.findIndex(
+      (item) => String(item.id) === productId
+    );
+
+    if (index !== -1) {
+      cartItems.splice(index, 1);
+      updateCartUI();
+      showToast("Product removed from cart");
+    }
+  }
+});
+
+// Add buttons to Deals and Best Sellers
+function addCartButtons() {
+  const productCards = document.querySelectorAll(
+    ".deal-card, .best-seller-card",
+  );
+
+  productCards.forEach((card, index) => {
+    // Prevent duplicate buttons
+    if (card.querySelector(".add-to-cart-btn")) return;
+
+    const titleElement =
+      card.querySelector(".deal-name") || card.querySelector("h3");
+
+    const priceElement =
+      card.querySelector(".deal-price") || card.querySelector(".bs-price");
+
+    const imageElement = card.querySelector("img");
+
+    if (!titleElement || !priceElement) return;
+
+    const title = titleElement.textContent.trim();
+    const price = getProductPrice(priceElement.textContent);
+
+    if (!price) return;
+
+    const product = {
+      id: `${title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-${index}`,
+      title,
+      price,
+      image: imageElement?.getAttribute("src") || "",
+    };
+
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "add-to-cart-btn";
+    button.textContent = "Add to Cart";
+
+    button.addEventListener("click", () => {
+      addToCart(product);
+    });
+
+    card.appendChild(button);
+  });
+}
+
+addCartButtons();
+updateCartUI();
 
 /* =========================================
    BACK TO TOP BUTTON
@@ -268,13 +590,12 @@ topBtn.setAttribute("aria-label", "Back to Top");
 document.body.appendChild(topBtn);
 
 window.addEventListener("scroll", () => {
-  topBtn.style.display =
-    window.scrollY > 300 ? "block" : "none";
+  topBtn.style.display = window.scrollY > 300 ? "block" : "none";
 });
 
 topBtn.addEventListener("click", () => {
   window.scrollTo({
     top: 0,
-    behavior: "smooth"
+    behavior: "smooth",
   });
 });
