@@ -357,7 +357,33 @@ document.addEventListener("keydown", (event) => {
    Add products and update cart count
 ===================================== */
 
-const cartItems = [];
+let cartItems = [];
+
+try {
+  const savedCart = localStorage.getItem("amazonCloneCart");
+
+  if (savedCart) {
+    const parsedCart = JSON.parse(savedCart);
+
+    if (Array.isArray(parsedCart)) {
+      cartItems = parsedCart.filter(
+        (item) =>
+          item &&
+          typeof item.id === "string" &&
+          typeof item.title === "string" &&
+          typeof item.price === "number" &&
+          Number.isFinite(item.price) &&
+          item.price >= 0 &&
+          Number.isInteger(item.quantity) &&
+          item.quantity > 0 &&
+          typeof item.image === "string"
+      );
+    }
+  }
+} catch (error) {
+  console.error("Could not load saved cart:", error);
+  cartItems = [];
+}
 
 // Price text ko number mein convert karo
 function getProductPrice(priceText) {
@@ -480,6 +506,16 @@ function updateCartUI() {
   // Checkout button only enabled when cart has items
   document.querySelector(".cart-checkout-btn").disabled =
     cartItems.length === 0;
+
+    try {
+  localStorage.setItem(
+    "amazonCloneCart",
+    JSON.stringify(cartItems)
+  );
+} catch (error) {
+  console.error("Could not save cart:", error);
+  showToast("Cart could not be saved in this browser");
+}
 }
 
 
