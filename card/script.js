@@ -376,7 +376,7 @@ try {
           item.price >= 0 &&
           Number.isInteger(item.quantity) &&
           item.quantity > 0 &&
-          typeof item.image === "string"
+          typeof item.image === "string",
       );
     }
   }
@@ -507,17 +507,13 @@ function updateCartUI() {
   document.querySelector(".cart-checkout-btn").disabled =
     cartItems.length === 0;
 
-    try {
-  localStorage.setItem(
-    "amazonCloneCart",
-    JSON.stringify(cartItems)
-  );
-} catch (error) {
-  console.error("Could not save cart:", error);
-  showToast("Cart could not be saved in this browser");
+  try {
+    localStorage.setItem("amazonCloneCart", JSON.stringify(cartItems));
+  } catch (error) {
+    console.error("Could not save cart:", error);
+    showToast("Cart could not be saved in this browser");
+  }
 }
-}
-
 
 const cartItemsContainer = document.querySelector("#cart-items");
 
@@ -529,9 +525,7 @@ cartItemsContainer.addEventListener("click", (event) => {
     const productId = quantityButton.dataset.id;
     const action = quantityButton.dataset.action;
 
-    const item = cartItems.find(
-      (product) => String(product.id) === productId
-    );
+    const item = cartItems.find((product) => String(product.id) === productId);
 
     if (!item) return;
 
@@ -552,9 +546,7 @@ cartItemsContainer.addEventListener("click", (event) => {
   if (removeButton) {
     const productId = removeButton.dataset.id;
 
-    const index = cartItems.findIndex(
-      (item) => String(item.id) === productId
-    );
+    const index = cartItems.findIndex((item) => String(item.id) === productId);
 
     if (index !== -1) {
       cartItems.splice(index, 1);
@@ -562,6 +554,34 @@ cartItemsContainer.addEventListener("click", (event) => {
       showToast("Product removed from cart");
     }
   }
+});
+
+const checkoutButton = document.querySelector(".cart-checkout-btn");
+const checkoutSection = document.querySelector("#checkout-section");
+const checkoutForm = document.querySelector("#checkout-form");
+const backToCartButton = document.querySelector("#back-to-cart");
+
+
+checkoutButton.addEventListener("click", () => {
+  if (cartItems.length === 0) {
+    showToast("Your cart is empty!");
+    return;
+  }
+
+  window.location.href = "checkout.html";
+});
+
+
+backToCartButton.addEventListener("click", () => {
+  checkoutSection.hidden = true;
+});
+
+checkoutForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+
+  if (!checkoutForm.reportValidity()) return;
+
+  showToast("Delivery details submitted successfully!");
 });
 
 // Add buttons to Deals and Best Sellers
@@ -608,7 +628,6 @@ function addCartButtons() {
     card.appendChild(button);
   });
 }
-
 addCartButtons();
 updateCartUI();
 

@@ -1,0 +1,366 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Checkout - Amazon Clone</title>
+  <link rel="stylesheet" href="card.css" />
+  
+<style>
+  /* Base styles */
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    background: #eaeded;
+    font-family: Arial, sans-serif;
+    color: #0f1111;
+  }
+
+  /* Checkout navbar */
+  .checkout-header {
+    height: 60px;
+    padding: 0 5%;
+    background: #131921;
+    color: #fff;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 16px;
+    border-bottom: 1px solid #37475a;
+  }
+
+  .checkout-header a {
+    color: #fff;
+    text-decoration: none;
+  }
+
+ .checkout-logo {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  line-height: 1;
+}
+.checkout-logo img {
+  display: block;
+  width: 100px;
+  height: 36px;
+  object-fit: contain;
+  object-position: left center;
+}
+
+  .checkout-logo span {
+    color: #ff9900;
+  }
+
+  .checkout-title {
+    justify-self: center;
+    color: #fff;
+    font-size: 20px;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  .checkout-lock {
+    justify-self: end;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    color: #fff;
+    font-size: 13px;
+    white-space: nowrap;
+  }
+
+  .checkout-lock svg {
+    display: block;
+    width: 18px;
+    height: 18px;
+    flex: 0 0 18px;
+    stroke: #a7d7a9;
+  }
+
+  /* Main checkout layout */
+  .checkout-main {
+    max-width: 1100px;
+    margin: 30px auto;
+    padding: 0 20px;
+  }
+
+  .checkout-main > h1 {
+    margin: 0 0 18px;
+    font-size: 28px;
+  }
+
+  .checkout-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 320px;
+    gap: 24px;
+    align-items: start;
+  }
+
+  .checkout-panel,
+  .order-summary {
+    min-width: 0;
+    background: #fff;
+    padding: 24px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+  }
+
+  .checkout-panel h2 {
+    margin: 0 0 14px;
+    font-size: 22px;
+  }
+
+  /* Delivery form */
+  .checkout-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .checkout-form label {
+    margin-top: 8px;
+    font-weight: 600;
+  }
+
+  .checkout-form input,
+  .checkout-form textarea,
+  .checkout-form select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #888c8c;
+    border-radius: 4px;
+    font: inherit;
+    background: #fff;
+  }
+
+  .checkout-form input:focus,
+  .checkout-form textarea:focus,
+  .checkout-form select:focus {
+    outline: 2px solid #007185;
+    outline-offset: 1px;
+  }
+
+  /* Buttons */
+  .amazon-button {
+    width: 100%;
+    margin-top: 12px;
+    padding: 12px 18px;
+    background: #ffd814;
+    border: 1px solid #fcd200;
+    border-radius: 20px;
+    cursor: pointer;
+    font: inherit;
+  }
+
+  .amazon-button:hover {
+    background: #f7ca00;
+  }
+
+  /* Order summary */
+  .order-summary h3 {
+    margin: 0 0 16px;
+    font-size: 23px;
+  }
+
+  .summary-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 14px 0;
+  }
+
+  .checkout-product {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 0;
+    border-bottom: 1px solid #ddd;
+  }
+
+  .checkout-product img {
+    width: 75px;
+    height: 75px;
+    flex-shrink: 0;
+    object-fit: contain;
+  }
+
+  .checkout-product p {
+    margin: 5px 0;
+    font-size: 14px;
+    overflow-wrap: anywhere;
+  }
+
+  .checkout-empty {
+    padding: 24px;
+    background: #fff;
+    border-radius: 6px;
+  }
+
+  /* Responsive layout */
+  @media (max-width: 750px) {
+    .checkout-layout {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 12px;
+    }
+
+    .checkout-main {
+      margin-top: 20px;
+      padding: 0 12px;
+    }
+
+    .checkout-panel,
+    .order-summary {
+      padding: 18px;
+    }
+
+    .checkout-main > h1 {
+      font-size: 24px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .checkout-header {
+      height: 56px;
+      padding: 0 12px;
+      gap: 8px;
+    }
+
+    .checkout-logo {
+      font-size: 21px;
+    }
+
+    .checkout-title {
+      font-size: 15px;
+    }
+
+    .checkout-lock {
+      gap: 4px;
+      font-size: 10px;
+    }
+
+    .checkout-lock svg {
+      width: 15px;
+      height: 15px;
+      flex-basis: 15px;
+    }
+  }
+</style>
+
+</head>
+<body>
+  
+<header class="checkout-header">
+  <a href="card.html" class="checkout-logo">
+    <img src="https://www.pngmart.com/files/23/Amazon-Logo-White-PNG-Isolated-HD.png" alt="Amazon">
+  </a>
+
+  <div class="checkout-title">Checkout</div>
+
+  <div class="checkout-lock">
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.8"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      aria-hidden="true"
+    >
+      <rect x="4" y="10" width="16" height="11" rx="2"></rect>
+      <path d="M8 10V7a4 4 0 0 1 8 0v3"></path>
+    </svg>
+    Secure checkout
+  </div>
+</header>
+
+
+  <main class="checkout-main">
+    <h1>Checkout</h1>
+
+    <div id="checkout-empty" class="checkout-empty" hidden>
+      <h2>Your cart is empty</h2>
+      <p>Add products to your cart before checking out.</p>
+      <a href="card.html">Return to shopping</a>
+    </div>
+
+    <div id="checkout-content" class="checkout-layout" hidden>
+      <div>
+        <section class="checkout-panel">
+          <h2>1. Delivery address</h2>
+
+          <form id="checkout-form" class="checkout-form">
+            <label for="customer-name">Full name</label>
+            <input id="customer-name" name="customerName"
+              type="text" autocomplete="name" required />
+
+            <label for="customer-phone">Mobile number</label>
+            <input id="customer-phone" name="phone"
+              type="tel" inputmode="numeric"
+              pattern="[6-9][0-9]{9}" maxlength="10"
+              autocomplete="tel" required />
+
+            <label for="customer-address">Address</label>
+            <textarea id="customer-address" name="address"
+              rows="3" autocomplete="street-address" required></textarea>
+
+            <label for="customer-city">City</label>
+            <input id="customer-city" name="city"
+              autocomplete="address-level2" required />
+
+            <label for="customer-pincode">PIN code</label>
+            <input id="customer-pincode" name="pincode"
+              type="text" inputmode="numeric"
+              pattern="[0-9]{6}" maxlength="6"
+              autocomplete="postal-code" required />
+
+            <h2>2. Payment method</h2>
+            <label for="payment-method">Choose payment</label>
+            <select id="payment-method" name="paymentMethod" required>
+              <option value="cod">Cash on Delivery</option>
+              <option value="demo-online">Online payment (demo only)</option>
+            </select>
+
+            <button class="amazon-button" type="submit">
+              Place your order
+            </button>
+          </form>
+        </section>
+      </div>
+
+      <aside class="order-summary">
+        <h3>Order Summary</h3>
+        <div id="checkout-products"></div>
+
+        <div class="summary-row">
+          <span>Items subtotal:</span>
+          <strong id="checkout-subtotal">₹0</strong>
+        </div>
+
+        <div class="summary-row">
+          <span>Delivery:</span>
+          <strong id="checkout-delivery">₹0</strong>
+        </div>
+
+        <hr />
+
+        <div class="summary-row">
+          <strong>Order total:</strong>
+          <strong id="checkout-total">₹0</strong>
+        </div>
+
+        <p style="font-size: 12px; color: #565959;">
+          This is a demo checkout. No real payment will be processed.
+        </p>
+      </aside>
+    </div>
+  </main>
+
+  <script src="checkout.js"></script>
+</body>
+</html>

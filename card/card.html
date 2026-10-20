@@ -648,6 +648,52 @@
         </div>
 
         </div>
+        <!-- Checkout Section -->
+<section id="checkout-section" class="checkout-section" hidden>
+  <div class="checkout-container">
+    <h2>Checkout</h2>
+    <p>Enter your delivery details</p>
+
+    <form id="checkout-form">
+      <label for="customer-name">Full Name</label>
+      <input
+        type="text"
+        id="customer-name"
+        name="customerName"
+        placeholder="Enter your full name"
+        required
+      />
+
+      <label for="customer-phone">Mobile Number</label>
+      <input
+        type="tel"
+        id="customer-phone"
+        name="phone"
+        placeholder="10-digit mobile number"
+        pattern="[6-9][0-9]{9}"
+        maxlength="10"
+        required
+      />
+
+      <label for="customer-address">Delivery Address</label>
+      <textarea
+        id="customer-address"
+        name="address"
+        placeholder="House no., street, city, state, PIN code"
+        rows="4"
+        required
+      ></textarea>
+
+      <button type="submit" class="place-order-btn">
+        Continue
+      </button>
+
+      <button type="button" id="back-to-cart" class="back-to-cart-btn">
+        Back to Cart
+      </button>
+    </form>
+  </div>
+</section>
         <div class="footer-bottom-content">
           <div class="footer-links">
             <ul>
@@ -660,6 +706,7 @@
           </div>
         </div>
       </div>
+
     </footer>
     <script src="script.js"></script>
   </body>
