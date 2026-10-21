@@ -1,4 +1,3 @@
-
 const CART_STORAGE_KEY = "amazonCloneCart";
 
 const checkoutEmpty = document.querySelector("#checkout-empty");
@@ -25,7 +24,7 @@ function loadCheckoutCart() {
             Number.isFinite(item.price) &&
             item.price >= 0 &&
             Number.isInteger(item.quantity) &&
-            item.quantity > 0
+            item.quantity > 0,
         )
       : [];
   } catch (error) {
@@ -88,3 +87,56 @@ function renderCheckoutCart() {
 }
 
 loadCheckoutCart();
+
+const checkoutForm = document.querySelector("#checkout-form");
+
+checkoutForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+
+  if (checkoutCart.length === 0) {
+    alert("Your cart is empty!");
+    return;
+  }
+
+  if (!checkoutForm.reportValidity()) {
+    return;
+  }
+
+  const customerName = document.querySelector("#customer-name").value.trim();
+
+  const paymentMethod = document.querySelector("#payment-method").value;
+
+  const subtotal = checkoutCart.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0,
+  );
+
+  const orderId = "AMZ" + Date.now().toString().slice(-8);
+
+  const order = {
+    orderId,
+    customerName,
+    phone: document.querySelector("#customer-phone").value.trim(),
+    address: [
+      document.querySelector("#customer-address").value.trim(),
+      document.querySelector("#customer-city").value.trim(),
+      document.querySelector("#customer-pincode").value.trim(),
+    ].join(", "),
+    paymentMethod,
+    items: checkoutCart,
+    subtotal,
+    total: subtotal,
+    createdAt: new Date().toISOString(),
+  };
+
+  try {
+    localStorage.setItem("amazonCloneLastOrder", JSON.stringify(order));
+    localStorage.removeItem(CART_STORAGE_KEY);
+  } catch (error) {
+    console.error("Could not save order:", error);
+    alert("Unable to save your demo order. Please try again.");
+    return;
+  }
+
+  window.location.href = "order-confirmation.html";
+});
