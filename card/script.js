@@ -497,6 +497,15 @@ function updateCartUI() {
         data-id="${item.id}"
       >Remove</button>
     </div>
+    
+<button
+  type="button"
+  class="cart-buy-now-btn"
+  data-id="${item.id}"
+>
+  Buy Now
+</button>
+
   </article>
 `,
       )
@@ -585,9 +594,10 @@ checkoutForm.addEventListener("submit", (event) => {
 });
 
 // Add buttons to Deals and Best Sellers
+
 function addCartButtons() {
   const productCards = document.querySelectorAll(
-    ".deal-card, .best-seller-card",
+    ".deal-card, .best-seller-card"
   );
 
   productCards.forEach((card, index) => {
@@ -616,6 +626,7 @@ function addCartButtons() {
       image: imageElement?.getAttribute("src") || "",
     };
 
+    // Add to Cart button
     const button = document.createElement("button");
     button.type = "button";
     button.className = "add-to-cart-btn";
@@ -626,8 +637,36 @@ function addCartButtons() {
     });
 
     card.appendChild(button);
+
+    // Buy Now button
+    const buyNowButton = document.createElement("button");
+    buyNowButton.type = "button";
+    buyNowButton.className = "buy-now-btn";
+    buyNowButton.textContent = "Buy Now";
+
+    buyNowButton.addEventListener("click", () => {
+      try {
+        localStorage.setItem(
+          "amazonCloneBuyNow",
+          JSON.stringify({
+            ...product,
+            quantity: 1,
+          })
+        );
+
+        localStorage.setItem("amazonCloneCheckoutMode", "buyNow");
+
+        window.location.href = "checkout.html";
+      } catch (error) {
+        console.error("Could not start Buy Now checkout:", error);
+        showToast("Unable to start checkout. Please try again.");
+      }
+    });
+
+    card.appendChild(buyNowButton);
   });
 }
+
 addCartButtons();
 updateCartUI();
 

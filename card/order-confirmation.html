@@ -1,268 +1,281 @@
-
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Order Confirmation - Amazon Clone</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Order Confirmation - Amazon Clone</title>
 
-  <style>
-    * {
-      box-sizing: border-box;
-    }
+    <style>
+      * {
+        box-sizing: border-box;
+      }
 
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #eaeded;
-      color: #0f1111;
-    }
+      body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #eaeded;
+        color: #0f1111;
+      }
 
-    
-.confirmation-header {
-  height: 64px;
-  padding: 0 5%;
-  background: #131921;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px;
-  color: white;
-}
+      .confirmation-header {
+        height: 64px;
+        padding: 0 5%;
+        background: #131921;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        color: white;
+      }
 
-.checkout-logo {
-  display: flex;
-  align-items: center;
-  flex-shrink: 0;
-  line-height: 1;
-}
+      .checkout-logo {
+        display: flex;
+        align-items: center;
+        flex-shrink: 0;
+        line-height: 1;
+      }
 
-.checkout-logo img {
-  display: block;
-  width: 110px;
-  height: 40px;
-  object-fit: contain;
-  object-position: left center;
-}
+      .checkout-logo img {
+        display: block;
+        width: 110px;
+        height: 40px;
+        object-fit: contain;
+        object-position: left center;
+      }
 
-.confirmation-header strong {
-  font-size: 16px;
-  font-weight: 500;
-}
+      .confirmation-header strong {
+        font-size: 16px;
+        font-weight: 500;
+      }
 
-@media (max-width: 500px) {
-  .confirmation-header {
-    height: 58px;
-    padding: 0 14px;
-    gap: 10px;
-  }
+      @media (max-width: 500px) {
+        .confirmation-header {
+          height: 58px;
+          padding: 0 14px;
+          gap: 10px;
+        }
 
-  .checkout-logo img {
-    width: 85px;
-    height: 32px;
-  }
+        .checkout-logo img {
+          width: 85px;
+          height: 32px;
+        }
 
-  .confirmation-header strong {
-    font-size: 12px;
-  }
-}
+        .confirmation-header strong {
+          font-size: 12px;
+        }
+      }
 
+      .success-heading {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-bottom: 24px;
+      }
 
-    .success-heading {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      margin-bottom: 24px;
-    }
-
-    .success-icon {
-      width: 42px;
-      height: 42px;
-      flex-shrink: 0;
-      border: 3px solid #067d62;
-      color: #067d62;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 26px;
-      font-weight: bold;
-    }
-
-    .success-heading h1 {
-      margin: 0;
-      font-size: 24px;
-      color: #067d62;
-    }
-
-    .success-heading p {
-      margin: 7px 0 0;
-      color: #565959;
-    }
-
-    .order-details {
-      border-top: 1px solid #ddd;
-      padding-top: 20px;
-    }
-
-    .order-details h2 {
-      font-size: 19px;
-    }
-
-    .detail-row {
-      display: flex;
-      justify-content: space-between;
-      gap: 16px;
-      padding: 10px 0;
-    }
-
-    .detail-row span:last-child {
-      text-align: right;
-      overflow-wrap: anywhere;
-    }
-
-    .confirmation-buttons {
-      display: flex;
-      gap: 12px;
-      margin-top: 25px;
-      flex-wrap: wrap;
-    }
-
-    .confirmation-buttons a {
-      display: inline-block;
-      padding: 12px 20px;
-      border-radius: 24px;
-      text-decoration: none;
-      text-align: center;
-      font-size: 14px;
-    }
-
-    .continue-shopping {
-      background: #ffd814;
-      border: 1px solid #fcd200;
-      color: #0f1111;
-    }
-
-    .view-orders {
-      background: white;
-      border: 1px solid #888c8c;
-      color: #0f1111;
-    }
-
-    @media (max-width: 500px) {
-      .confirmation-card {
-        padding: 20px;
+      .success-icon {
+        width: 42px;
+        height: 42px;
+        flex-shrink: 0;
+        border: 3px solid #067d62;
+        color: #067d62;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 26px;
+        font-weight: bold;
       }
 
       .success-heading h1 {
-        font-size: 20px;
+        margin: 0;
+        font-size: 24px;
+        color: #067d62;
+      }
+
+      .success-heading p {
+        margin: 7px 0 0;
+        color: #565959;
+      }
+
+      .order-details {
+        border-top: 1px solid #ddd;
+        padding-top: 20px;
+      }
+
+      .order-details h2 {
+        margin: 0 0 14px;
+        font-size: 19px;
       }
 
       .detail-row {
-        flex-direction: column;
-        gap: 5px;
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 10px 0;
       }
 
       .detail-row span:last-child {
-        text-align: left;
+        text-align: right;
+        overflow-wrap: anywhere;
+      }
+
+      .confirmation-buttons {
+        display: flex;
+        gap: 12px;
+        margin-top: 25px;
+        flex-wrap: wrap;
       }
 
       .confirmation-buttons a {
-        width: 100%;
+        display: inline-block;
+        padding: 12px 20px;
+        border-radius: 24px;
+        text-decoration: none;
+        text-align: center;
+        font-size: 14px;
       }
-    }
-  </style>
-</head>
 
-<body>
-  <header class="confirmation-header">
-    <a href="card.html" class="checkout-logo">
-    <img src="https://www.pngmart.com/files/23/Amazon-Logo-White-PNG-Isolated-HD.png" alt="Amazon">
-  </a>
-    <strong>Order Confirmation</strong>
-  </header>
+      .continue-shopping {
+        background: #ffd814;
+        border: 1px solid #fcd200;
+        color: #0f1111;
+      }
 
-  <main class="confirmation-container">
-    <section class="confirmation-card">
-      <div class="success-heading">
-        <div class="success-icon">✓</div>
+      .view-orders {
+        background: white;
+        border: 1px solid #888c8c;
+        color: #0f1111;
+      }
 
-        <div>
-          <h1>Order placed successfully!</h1>
-          <p>Thank you for shopping with us.</p>
+      /* Confirmation card layout */
+      .confirmation-container {
+        width: 100%;
+        max-width: 850px;
+        margin: 32px auto;
+        padding: 0 16px;
+      }
+
+      .confirmation-card {
+        width: 100%;
+        background: #fff;
+        padding: 30px;
+        border: 1px solid #d5d9d9;
+        border-radius: 8px;
+      }
+
+      @media (max-width: 500px) {
+        .confirmation-card {
+          padding: 20px;
+        }
+
+        .success-heading h1 {
+          font-size: 20px;
+        }
+
+        .detail-row {
+          flex-direction: column;
+          gap: 5px;
+        }
+
+        .detail-row span:last-child {
+          text-align: left;
+        }
+
+        .confirmation-buttons a {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <header class="confirmation-header">
+      <a href="card.html" class="checkout-logo">
+        <img
+          src="https://www.pngmart.com/files/23/Amazon-Logo-White-PNG-Isolated-HD.png"
+          alt="Amazon"
+        />
+      </a>
+      <strong>Order Confirmation</strong>
+    </header>
+
+    <main class="confirmation-container">
+      <section class="confirmation-card">
+        <div class="success-heading">
+          <div class="success-icon">✓</div>
+
+          <div>
+            <h1>Order placed successfully!</h1>
+            <p>Thank you for shopping with us.</p>
+          </div>
         </div>
-      </div>
 
-      <div class="order-details">
-        <h2>Order Details</h2>
+        <div class="order-details">
+          <h2>Order Details</h2>
 
-        <div class="detail-row">
-          <span>Order ID</span>
-          <strong id="confirmation-order-id">Loading...</strong>
+          <div class="detail-row">
+            <span>Order ID</span>
+            <strong id="confirmation-order-id">Loading...</strong>
+          </div>
+
+          <div class="detail-row">
+            <span>Customer</span>
+            <strong id="confirmation-customer"></strong>
+          </div>
+
+          <div class="detail-row">
+            <span>Delivery address</span>
+            <span id="confirmation-address"></span>
+          </div>
+
+          <div class="detail-row">
+            <span>Payment method</span>
+            <span id="confirmation-payment"></span>
+          </div>
+
+          <div class="detail-row">
+            <span>Order total</span>
+            <strong id="confirmation-total"></strong>
+          </div>
         </div>
 
-        <div class="detail-row">
-          <span>Customer</span>
-          <strong id="confirmation-customer"></strong>
+        <div class="confirmation-buttons">
+          <a href="card.html" class="continue-shopping"> Continue Shopping </a>
+
+          <a href="card.html" class="view-orders"> Back to Home </a>
         </div>
+      </section>
+    </main>
 
-        <div class="detail-row">
-          <span>Delivery address</span>
-          <span id="confirmation-address"></span>
-        </div>
+    <script>
+      const order = JSON.parse(
+        localStorage.getItem("amazonCloneLastOrder") || "null",
+      );
 
-        <div class="detail-row">
-          <span>Payment method</span>
-          <span id="confirmation-payment"></span>
-        </div>
+      if (order && order.orderId) {
+        document.querySelector("#confirmation-order-id").textContent =
+          order.orderId;
 
-        <div class="detail-row">
-          <span>Order total</span>
-          <strong id="confirmation-total"></strong>
-        </div>
-      </div>
+        document.querySelector("#confirmation-customer").textContent =
+          order.customerName || "Customer";
 
-      <div class="confirmation-buttons">
-        <a href="card.html" class="continue-shopping">
-          Continue Shopping
-        </a>
+        document.querySelector("#confirmation-address").textContent =
+          order.address || "Not available";
 
-        <a href="card.html" class="view-orders">
-          Back to Home
-        </a>
-      </div>
-    </section>
-  </main>
+        document.querySelector("#confirmation-payment").textContent =
+          order.paymentMethod === "cod"
+            ? "Cash on Delivery"
+            : "Online payment (demo only)";
 
-  <script>
-    const order = JSON.parse(
-      localStorage.getItem("amazonCloneLastOrder") || "null"
-    );
-
-    if (order && order.orderId) {
-      document.querySelector("#confirmation-order-id").textContent =
-        order.orderId;
-
-      document.querySelector("#confirmation-customer").textContent =
-        order.customerName || "Customer";
-
-      document.querySelector("#confirmation-address").textContent =
-        order.address || "Not available";
-
-      document.querySelector("#confirmation-payment").textContent =
-        order.paymentMethod === "cod"
-          ? "Cash on Delivery"
-          : "Online payment (demo only)";
-
-      document.querySelector("#confirmation-total").textContent =
-        `₹${Number(order.total).toLocaleString("en-IN")}`;
-    } else {
-      document.querySelector(".confirmation-card").innerHTML = `
+        document.querySelector("#confirmation-total").textContent =
+          `₹${Number(order.total).toLocaleString("en-IN")}`;
+      } else {
+        document.querySelector(".confirmation-card").innerHTML = `
         <h1>No recent order found</h1>
         <p>Please place an order before viewing confirmation.</p>
         <a href="card.html">Return to shopping</a>
       `;
-    }
-  </script>
-</body>
+      }
+    </script>
+  </body>
 </html>

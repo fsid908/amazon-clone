@@ -2093,3 +2093,36 @@ body {
 .back-to-cart-btn {
   background: #e7e9ec;
 }
+
+.buy-now-btn {
+  display: block;
+  width: 100%;
+  margin-top: 8px;
+  padding: 10px 14px;
+  background: #ffa41c;
+  border: 1px solid #ff8f00;
+  border-radius: 20px;
+  color: #0f1111;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.buy-now-btn:hover {
+  background: #fa8900;
+}
+
+.cart-buy-now-btn {
+  display: block;
+  margin-top: 8px;
+  padding: 7px 14px;
+  background: #ffa41c;
+  border: 1px solid #ff8f00;
+  border-radius: 18px;
+  color: #0f1111;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.cart-buy-now-btn:hover {
+  background: #fa8900;
+}
