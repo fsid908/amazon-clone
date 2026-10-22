@@ -1,0 +1,33 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Your Orders | Amazon Clone</title>
+  <link rel="stylesheet" href="my-orders.css" />
+  <script src="my-orders.js" defer></script>
+</head>
+<body>
+  <header class="orders-header">
+    <a href="card.html" class="orders-logo">amazon<span>.in</span></a>
+    <h1>Your Orders</h1>
+    <a href="card.html" class="back-home">Continue Shopping</a>
+  </header>
+
+  <main class="orders-container">
+    <div class="orders-heading">
+      <h2>Your Orders</h2>
+      <p>View your recent and past orders</p>
+    </div>
+
+    <section id="orders-list" aria-live="polite"></section>
+
+    <section id="orders-empty" class="empty-orders" hidden>
+      <h2>No orders yet</h2>
+      <p>Your placed orders will appear here.</p>
+      <a href="card.html" class="shop-button">Start Shopping</a>
+    </section>
+  </main>
+</body>
+</html>

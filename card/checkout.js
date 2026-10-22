@@ -157,6 +157,18 @@ checkoutForm.addEventListener("submit", (event) => {
  
 try {
   localStorage.setItem("amazonCloneLastOrder", JSON.stringify(order));
+  
+const savedOrders = JSON.parse(
+  localStorage.getItem("amazonCloneOrders") || "[]"
+);
+
+savedOrders.unshift(order);
+
+localStorage.setItem(
+  "amazonCloneOrders",
+  JSON.stringify(savedOrders)
+);
+
 
   if (checkoutMode === "buyNow") {
     const purchasedItem = checkoutCart[0];
