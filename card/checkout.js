@@ -1,5 +1,12 @@
 const CART_STORAGE_KEY = "amazonCloneCart";
 
+const BUY_NOW_STORAGE_KEY = "amazonCloneBuyNow";
+const CHECKOUT_MODE_KEY = "amazonCloneCheckoutMode";
+
+const checkoutMode =
+  localStorage.getItem(CHECKOUT_MODE_KEY) || "cart";
+
+
 const checkoutEmpty = document.querySelector("#checkout-empty");
 const checkoutContent = document.querySelector("#checkout-content");
 const checkoutProducts = document.querySelector("#checkout-products");
@@ -11,7 +18,23 @@ const totalElement = document.querySelector("#checkout-total");
 let checkoutCart = [];
 
 function loadCheckoutCart() {
-  try {
+  
+try {
+  if (checkoutMode === "buyNow") {
+    const savedProduct = localStorage.getItem(BUY_NOW_STORAGE_KEY);
+    const product = savedProduct ? JSON.parse(savedProduct) : null;
+
+    checkoutCart =
+      product &&
+      typeof product.title === "string" &&
+      typeof product.price === "number" &&
+      Number.isFinite(product.price) &&
+      product.price >= 0 &&
+      Number.isInteger(product.quantity) &&
+      product.quantity > 0
+        ? [product]
+        : [];
+  } else {
     const savedCart = localStorage.getItem(CART_STORAGE_KEY);
     const parsedCart = savedCart ? JSON.parse(savedCart) : [];
 
@@ -24,15 +47,17 @@ function loadCheckoutCart() {
             Number.isFinite(item.price) &&
             item.price >= 0 &&
             Number.isInteger(item.quantity) &&
-            item.quantity > 0,
+            item.quantity > 0
         )
       : [];
-  } catch (error) {
-    console.error("Could not load checkout cart:", error);
-    checkoutCart = [];
   }
+} catch (error) {
+  console.error("Could not load checkout items:", error);
+  checkoutCart = [];
+}
 
-  renderCheckoutCart();
+renderCheckoutCart();
+
 }
 
 function renderCheckoutCart() {
@@ -129,14 +154,40 @@ checkoutForm.addEventListener("submit", (event) => {
     createdAt: new Date().toISOString(),
   };
 
-  try {
-    localStorage.setItem("amazonCloneLastOrder", JSON.stringify(order));
+ 
+try {
+  localStorage.setItem("amazonCloneLastOrder", JSON.stringify(order));
+
+  if (checkoutMode === "buyNow") {
+    const purchasedItem = checkoutCart[0];
+
+    const savedCart = localStorage.getItem(CART_STORAGE_KEY);
+    const parsedCart = savedCart ? JSON.parse(savedCart) : [];
+
+    const updatedCart = Array.isArray(parsedCart)
+      ? parsedCart.filter(
+          (item) => String(item.id) !== String(purchasedItem.id)
+        )
+      : [];
+
+    localStorage.setItem(
+      CART_STORAGE_KEY,
+      JSON.stringify(updatedCart)
+    );
+
+    localStorage.removeItem(BUY_NOW_STORAGE_KEY);
+    localStorage.removeItem(CHECKOUT_MODE_KEY);
+  } else {
     localStorage.removeItem(CART_STORAGE_KEY);
-  } catch (error) {
-    console.error("Could not save order:", error);
-    alert("Unable to save your demo order. Please try again.");
-    return;
+    localStorage.removeItem(BUY_NOW_STORAGE_KEY);
+    localStorage.removeItem(CHECKOUT_MODE_KEY);
   }
+} catch (error) {
+  console.error("Could not save order:", error);
+  alert("Unable to save your demo order. Please try again.");
+  return;
+}
+
 
   window.location.href = "order-confirmation.html";
 });

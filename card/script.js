@@ -529,6 +529,7 @@ const cartItemsContainer = document.querySelector("#cart-items");
 cartItemsContainer.addEventListener("click", (event) => {
   const quantityButton = event.target.closest(".quantity-btn");
   const removeButton = event.target.closest(".remove-cart-item");
+  const buyNowButton = event.target.closest(".cart-buy-now-btn");
 
   if (quantityButton) {
     const productId = quantityButton.dataset.id;
@@ -563,6 +564,31 @@ cartItemsContainer.addEventListener("click", (event) => {
       showToast("Product removed from cart");
     }
   }
+  
+  if (buyNowButton) {
+    const productId = buyNowButton.dataset.id;
+
+    const item = cartItems.find(
+      (product) => String(product.id) === productId
+    );
+
+    if (!item) return;
+
+    try {
+      localStorage.setItem(
+        "amazonCloneBuyNow",
+        JSON.stringify({ ...item })
+      );
+
+      localStorage.setItem("amazonCloneCheckoutMode", "buyNow");
+
+      window.location.href = "checkout.html";
+    } catch (error) {
+      console.error("Could not start Buy Now checkout:", error);
+      showToast("Unable to start checkout. Please try again.");
+    }
+  }
+
 });
 
 const checkoutButton = document.querySelector(".cart-checkout-btn");
