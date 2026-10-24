@@ -34,20 +34,25 @@ function showToast(message, duration = 2500) {
   }, duration);
 }
 
+
 /* =========================================
-   AMAZON CLONE - SEARCH FUNCTIONALITY
+   AMAZON CLONE - SEARCH, FILTER & SORT
 ========================================= */
 
 const searchInput = document.querySelector("#search-box");
 const clearBtn = document.querySelector("#clear-search");
+const categoryFilter = document.querySelector("#category-filter");
+const priceSort = document.querySelector("#price-sort");
+const productResultsStatus = document.querySelector(
+  "#product-results-status"
+);
 
 const homeSections = document.querySelectorAll(
   ".background-img, #container, #box, " +
     ".trending-section, .deals-section, .best-sellers, " +
-    "#bottom-content, .back-to-top-box, .last-bottom-txt, footer",
+    "#bottom-content, .back-to-top-box, .last-bottom-txt, footer"
 );
 
-// Search results area create karo
 const resultsSection = document.createElement("section");
 resultsSection.id = "search-results";
 
@@ -56,19 +61,21 @@ resultsSection.innerHTML = `
     <h2>Search results</h2>
     <p id="results-count"></p>
   </div>
-
   <div id="results-grid"></div>
-
   <div id="no-results">
     <div class="empty-search-icon">⌕</div>
-    <h2>No results found</h2>
-    <p>Try checking your spelling or use different keywords.</p>
+    <h2>No products found</h2>
+    <p>Try another keyword or change your filters.</p>
   </div>
 `;
 
 const navigation = document.querySelector(".Navigation");
 
-if (navigation) {
+const productTools = document.querySelector(".product-tools");
+
+if (productTools) {
+  productTools.insertAdjacentElement("afterend", resultsSection);
+} else if (navigation) {
   navigation.insertAdjacentElement("afterend", resultsSection);
 }
 
@@ -78,73 +85,122 @@ const noResults = resultsSection.querySelector("#no-results");
 
 resultsSection.style.display = "none";
 
-/* =========================================
-   COLLECT SEARCHABLE ITEMS
-========================================= */
-
 function getSearchItems() {
   const items = [];
+  const productCards = document.querySelectorAll(
+    ".deal-card, .best-seller-card"
+  );
 
-  // Category cards
+  // Existing category cards
   document
     .querySelectorAll("#container .card-box, #container .mini")
     .forEach((card) => {
       const heading = card.querySelector("h3");
-      const img = card.querySelector("img");
+      const image = card.querySelector("img");
 
       if (!heading) return;
 
       items.push({
         title: heading.textContent.trim(),
-        image: img?.getAttribute("src"),
-        alt: img?.getAttribute("alt") || "",
+        image: image?.getAttribute("src") || "",
+        alt: image?.getAttribute("alt") || "",
         description: "Category",
         keywords: card.textContent,
+        category: "Categories",
+        price: null,
+        product: null
       });
     });
 
-  // Trending, deals and best-seller cards
-  document
-    .querySelectorAll(".trending-card, .deal-card, .best-seller-card")
-    .forEach((card) => {
-      const heading =
-        card.querySelector(".deal-name") || card.querySelector("h3");
+  // Existing trending cards
+  document.querySelectorAll(".trending-card").forEach((card) => {
+    const heading = card.querySelector("h3");
+    const image = card.querySelector("img");
 
-      const img = card.querySelector("img");
+    if (!heading) return;
 
-      if (!heading) return;
-
-      const price = card.querySelector(".deal-price, .bs-price");
-
-      items.push({
-        title: heading.textContent.trim(),
-        image: img?.getAttribute("src"),
-        alt: img?.getAttribute("alt") || "",
-        description: price ? price.childNodes[0].textContent.trim() : "",
-        keywords: card.textContent,
-      });
+    items.push({
+      title: heading.textContent.trim(),
+      image: image?.getAttribute("src") || "",
+      alt: image?.getAttribute("alt") || "",
+      description: "Trending",
+      keywords: card.textContent,
+      category: "Trending",
+      price: null,
+      product: null
     });
+  });
+
+  // Existing Deals and Best Sellers
+  productCards.forEach((card, index) => {
+    const titleElement =
+      card.querySelector(".deal-name") || card.querySelector("h3");
+
+    const priceElement =
+      card.querySelector(".deal-price") ||
+      card.querySelector(".bs-price");
+
+    const image = card.querySelector("img");
+
+    if (!titleElement || !priceElement) return;
+
+    const title = titleElement.textContent.trim();
+    const price = getProductPrice(priceElement.textContent);
+
+    if (!price) return;
+
+    const product = {
+      id: `${title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-${index}`,
+      title,
+      price,
+      image: image?.getAttribute("src") || ""
+    };
+
+    const categoryElement = card.querySelector(".bs-category");
+
+    items.push({
+      title,
+      image: product.image,
+      alt: image?.getAttribute("alt") || "",
+      description: priceElement.textContent.trim(),
+      keywords: card.textContent,
+      category: categoryElement
+        ? categoryElement.textContent.trim()
+        : "Deals",
+      price,
+      product
+    });
+  });
 
   return items;
 }
 
 const searchItems = getSearchItems();
 
-/* =========================================
-   CREATE SEARCH RESULT CARD
-========================================= */
+// Populate categories from existing cards
+if (categoryFilter) {
+  const categories = [
+    ...new Set(searchItems.map((item) => item.category))
+  ].sort((a, b) => a.localeCompare(b));
+
+  categories.forEach((category) => {
+    const option = document.createElement("option");
+    option.value = category;
+    option.textContent = category;
+    categoryFilter.appendChild(option);
+  });
+}
 
 function createResultCard(item) {
   const card = document.createElement("article");
   card.className = "search-result-card";
 
   if (item.image) {
-    const img = document.createElement("img");
-    img.src = item.image;
-    img.alt = item.alt || item.title;
-    img.loading = "lazy";
-
-    card.appendChild(img);
+    const image = document.createElement("img");
+    image.src = item.image;
+    image.alt = item.alt || item.title;
+    image.loading = "lazy";
+    card.appendChild(image);
   }
 
   const title = document.createElement("h3");
@@ -152,37 +208,72 @@ function createResultCard(item) {
   card.appendChild(title);
 
   if (item.description) {
-    const description = document.createElement("p");
+  const description = document.createElement("p");
+
+  if (item.product && typeof item.price === "number") {
+    description.textContent = `₹${item.price.toLocaleString("en-IN")}`;
+  } else {
     description.textContent = item.description;
-    card.appendChild(description);
+  }
+
+  card.appendChild(description);
+}
+
+  if (item.product) {
+    const addButton = document.createElement("button");
+    addButton.type = "button";
+    addButton.className = "add-to-cart-btn";
+    addButton.textContent = "Add to Cart";
+    addButton.dataset.productId = item.product.id;
+    card.appendChild(addButton);
+
+    const buyButton = document.createElement("button");
+    buyButton.type = "button";
+    buyButton.className = "buy-now-btn";
+    buyButton.textContent = "Buy Now";
+    buyButton.dataset.productId = item.product.id;
+    card.appendChild(buyButton);
   }
 
   return card;
 }
 
-/* =========================================
-   PERFORM SEARCH
-========================================= */
-
 function performSearch() {
-  const query = searchInput.value.trim().toLowerCase();
+  const query = searchInput
+    ? searchInput.value.trim().toLowerCase()
+    : "";
+
+  const selectedCategory = categoryFilter
+    ? categoryFilter.value
+    : "all";
+
+  const selectedSort = priceSort
+    ? priceSort.value
+    : "default";
+
+  const filtersActive =
+    query !== "" ||
+    selectedCategory !== "all" ||
+    selectedSort !== "default";
 
   if (clearBtn) {
     clearBtn.style.display = query ? "block" : "none";
   }
 
-  // Empty search: homepage restore
-  if (!query) {
+  if (!filtersActive) {
     resultsSection.style.display = "none";
 
     homeSections.forEach((section) => {
       section.style.display = "";
     });
 
+    if (productResultsStatus) {
+      productResultsStatus.textContent = "";
+    }
+
     return;
   }
 
-  // Search mode: homepage sections hide
   homeSections.forEach((section) => {
     section.style.display = "none";
   });
@@ -190,20 +281,46 @@ function performSearch() {
   resultsSection.style.display = "block";
   resultsGrid.replaceChildren();
 
-  const matches = searchItems.filter((item) => {
+  let matches = searchItems.filter((item) => {
     const searchableText = [
       item.title,
       item.alt,
       item.description,
-      item.keywords,
+      item.keywords
     ]
       .join(" ")
       .toLowerCase();
 
-    return searchableText.includes(query);
+    const matchesQuery = searchableText.includes(query);
+
+    const matchesCategory =
+      selectedCategory === "all" ||
+      item.category === selectedCategory;
+
+    return matchesQuery && matchesCategory;
   });
 
-  resultsCount.textContent = `${matches.length} result${matches.length === 1 ? "" : "s"} for "${searchInput.value.trim()}"`;
+  if (selectedSort === "low-high") {
+    matches.sort((a, b) => {
+      if (a.price === null) return 1;
+      if (b.price === null) return -1;
+      return a.price - b.price;
+    });
+  } else if (selectedSort === "high-low") {
+    matches.sort((a, b) => {
+      if (a.price === null) return 1;
+      if (b.price === null) return -1;
+      return b.price - a.price;
+    });
+  }
+
+  resultsCount.textContent =
+    `${matches.length} result${matches.length === 1 ? "" : "s"}`;
+
+  if (productResultsStatus) {
+    productResultsStatus.textContent =
+      `${matches.length} result${matches.length === 1 ? "" : "s"} found`;
+  }
 
   if (matches.length === 0) {
     noResults.style.display = "block";
@@ -223,24 +340,68 @@ if (searchInput) {
   searchInput.addEventListener("input", performSearch);
 }
 
-/* =========================================
-   CLEAR SEARCH + TOAST
-========================================= */
+if (categoryFilter) {
+  categoryFilter.addEventListener("change", performSearch);
+}
+
+if (priceSort) {
+  priceSort.addEventListener("change", performSearch);
+}
+
+// Search results ke Add to Cart aur Buy Now buttons
+resultsGrid.addEventListener("click", (event) => {
+  const addButton = event.target.closest(".add-to-cart-btn");
+  const buyButton = event.target.closest(".buy-now-btn");
+
+  const clickedButton = addButton || buyButton;
+
+  if (!clickedButton) return;
+
+  const productId = clickedButton.dataset.productId;
+  const item = searchItems.find(
+    (entry) =>
+      entry.product &&
+      entry.product.id === productId
+  );
+
+  if (!item || !item.product) return;
+
+  if (addButton) {
+    addToCart(item.product);
+  }
+
+  if (buyButton) {
+    try {
+      localStorage.setItem(
+        "amazonCloneBuyNow",
+        JSON.stringify({
+          ...item.product,
+          quantity: 1
+        })
+      );
+
+      localStorage.setItem("amazonCloneCheckoutMode", "buyNow");
+      window.location.href = "checkout.html";
+    } catch (error) {
+      console.error("Could not start Buy Now checkout:", error);
+      showToast("Unable to start checkout. Please try again.");
+    }
+  }
+});
 
 if (clearBtn && searchInput) {
   clearBtn.addEventListener("click", () => {
-    // Search clear karo
     searchInput.value = "";
 
-    // Homepage restore karo
+    if (categoryFilter) categoryFilter.value = "all";
+    if (priceSort) priceSort.value = "default";
+
     performSearch();
-
-    // Toast notification dikhao
     showToast("Search cleared successfully");
-
     searchInput.focus();
   });
 }
+
 
 /* =====================================
    SHOPPING CART - STAGE 1
