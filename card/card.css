@@ -2329,3 +2329,92 @@ body {
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+.wishlist-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  margin: 8px 0;
+  border: 1px solid #d5d9d9;
+  border-radius: 50%;
+  background: #fff;
+  color: #b12704;
+  font-size: 25px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.wishlist-btn:hover {
+  background: #fff0f0;
+  transform: scale(1.06);
+}
+
+.wishlist-btn.is-wishlisted {
+  color: #e11d48;
+  border-color: #e11d48;
+}
+
+/* Wishlist button spacing and product card alignment */
+.deal-card,
+.best-seller-card {
+  box-sizing: border-box;
+  padding-bottom: 12px;
+}
+
+.deal-card .wishlist-btn,
+.best-seller-card .wishlist-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  margin: 8px 12px 0;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.deal-card .add-to-cart-btn,
+.deal-card .buy-now-btn,
+.best-seller-card .add-to-cart-btn,
+.best-seller-card .buy-now-btn {
+  display: block;
+  width: calc(100% - 24px);
+  margin: 8px 12px 0;
+  box-sizing: border-box;
+}
+
+.deal-card .deal-info,
+.best-seller-card {
+  min-width: 0;
+}
+
+.deal-card .deal-info {
+  padding: 12px 15px 4px;
+}
+
+.best-seller-card {
+  padding: 12px;
+}
+
+@media (max-width: 600px) {
+  .deal-card .deal-info {
+    padding: 10px;
+  }
+
+  .deal-card .add-to-cart-btn,
+  .deal-card .buy-now-btn,
+  .best-seller-card .add-to-cart-btn,
+  .best-seller-card .buy-now-btn {
+    width: calc(100% - 16px);
+    margin-left: 8px;
+    margin-right: 8px;
+  }
+
+  .deal-card .wishlist-btn,
+  .best-seller-card .wishlist-btn {
+    margin-left: 8px;
+  }
+}

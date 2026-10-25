@@ -573,6 +573,74 @@ function addToCart(product) {
   showToast(`${product.title} added to cart`);
 }
 
+/* =========================================
+   WISHLIST - LOCAL STORAGE
+========================================= */
+
+const WISHLIST_STORAGE_KEY = "amazonCloneWishlist";
+
+function getWishlist() {
+  try {
+    const savedWishlist = localStorage.getItem(
+      WISHLIST_STORAGE_KEY
+    );
+
+    const parsedWishlist = savedWishlist
+      ? JSON.parse(savedWishlist)
+      : [];
+
+    return Array.isArray(parsedWishlist)
+      ? parsedWishlist
+      : [];
+  } catch (error) {
+    console.error("Could not load wishlist:", error);
+    return [];
+  }
+}
+
+function saveWishlist(wishlist) {
+  try {
+    localStorage.setItem(
+      WISHLIST_STORAGE_KEY,
+      JSON.stringify(wishlist)
+    );
+
+    return true;
+  } catch (error) {
+    console.error("Could not save wishlist:", error);
+    showToast("Could not save wishlist. Please try again.");
+    return false;
+  }
+}
+
+function addToWishlist(product) {
+  const wishlist = getWishlist();
+
+  const alreadyExists = wishlist.some(
+    (item) => item.id === product.id
+  );
+
+  if (alreadyExists) {
+    showToast("Product is already in your wishlist");
+    return;
+  }
+
+  wishlist.push(product);
+
+  if (saveWishlist(wishlist)) {
+    showToast(`${product.title} added to wishlist`);
+  }
+}
+
+function removeFromWishlist(productId) {
+  const wishlist = getWishlist();
+
+  const updatedWishlist = wishlist.filter(
+    (item) => item.id !== productId
+  );
+
+  return saveWishlist(updatedWishlist);
+}
 // Cart count aur subtotal update karo
 function updateCartUI() {
   const totalQuantity = cartItems.reduce(
@@ -851,6 +919,60 @@ function addCartButtons() {
     });
 
     card.appendChild(buyNowButton);
+
+    // Add to Wishlist button
+    const wishlistButton = document.createElement("button");
+    wishlistButton.type = "button";
+    wishlistButton.className = "wishlist-btn";
+    wishlistButton.textContent = "♡";
+    wishlistButton.setAttribute(
+      "aria-label",
+      `Add ${product.title} to wishlist`
+    );
+    wishlistButton.title = "Add to Wishlist";
+
+    const savedWishlist = getWishlist();
+
+    if (savedWishlist.some((item) => item.id === product.id)) {
+      wishlistButton.textContent = "♥";
+      wishlistButton.classList.add("is-wishlisted");
+    }
+
+    wishlistButton.addEventListener("click", () => {
+      const wishlist = getWishlist();
+      const alreadyExists = wishlist.some(
+        (item) => item.id === product.id
+      );
+
+      if (alreadyExists) {
+        const updatedWishlist = wishlist.filter(
+          (item) => item.id !== product.id
+        );
+
+        if (saveWishlist(updatedWishlist)) {
+          wishlistButton.textContent = "♡";
+          wishlistButton.classList.remove("is-wishlisted");
+          wishlistButton.title = "Add to Wishlist";
+          showToast("Removed from wishlist");
+        }
+      } else {
+        addToWishlist({
+          ...product,
+          quantity: 1,
+        });
+
+        const updatedWishlist = getWishlist();
+
+        if (updatedWishlist.some((item) => item.id === product.id)) {
+          wishlistButton.textContent = "♥";
+          wishlistButton.classList.add("is-wishlisted");
+          wishlistButton.title = "Remove from Wishlist";
+        }
+      }
+    });
+
+    card.appendChild(wishlistButton);
+
   });
 }
 
